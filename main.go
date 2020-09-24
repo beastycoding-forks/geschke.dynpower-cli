@@ -8,34 +8,6 @@ import (
 	"github.com/geschke/dynpower-cli/cmd"
 )
 
-func handleDomainCommand(fs *flag.FlagSet, dsn string) {
-	fmt.Println("handle Domain command")
-	fmt.Println(fs.Args())
-	switch fs.Arg(0) {
-	case "list":
-		fmt.Println("Command: list")
-	case "add":
-		fmt.Println("Command: add")
-	default:
-		fmt.Println("Unknown command.")
-	}
-
-}
-
-func handleHostCommand(fs *flag.FlagSet, dsn string) {
-	fmt.Println("handle Host command")
-	fmt.Println(fs.Args())
-	switch fs.Arg(0) {
-	case "list":
-		fmt.Println("Command: list")
-	case "add":
-		fmt.Println("Command: add")
-	default:
-		fmt.Println("Unknown command.")
-	}
-
-}
-
 func main() {
 	fmt.Println("dyncli is a small helper tool to manage the dynpower database.")
 
@@ -84,7 +56,7 @@ func main() {
 		fmt.Println("  dsn:", *domainDsn)
 		fmt.Println("  tail:", domainCmd.Args())
 
-		handleDomainCommand(domainCmd, *domainDsn)
+		cmd.HandleDomain(domainCmd, *domainDsn)
 
 		fmt.Println("")
 	case "host":
@@ -102,7 +74,7 @@ func main() {
 		fmt.Println("subcommand 'host'")
 		fmt.Println("  dsn:", *hostDsn)
 		fmt.Println("  tail:", hostCmd.Args())
-		handleHostCommand(hostCmd, *hostDsn)
+		cmd.HandleHost(hostCmd, *hostDsn)
 
 		fmt.Println("")
 	default:

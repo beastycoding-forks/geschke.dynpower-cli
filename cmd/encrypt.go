@@ -6,6 +6,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+/*
+*  Encrypt string with bcrypt algorithm
+ */
 func Encrypt(pw string) {
 	fmt.Println("Password: ")
 	fmt.Println(pw)
@@ -14,7 +17,6 @@ func Encrypt(pw string) {
 	if err != nil {
 		panic(err)
 	}
-
 	fmt.Println("\nYour encrypted password:\n")
 	fmt.Println(string(hashedPassword))
 	fmt.Println("\nPlease enter this string in the field 'access_key' into the domains table.\n")

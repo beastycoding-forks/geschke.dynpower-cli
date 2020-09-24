@@ -2,4 +2,7 @@ module github.com/geschke/dynpower-cli
 
 go 1.15
 
-require golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+require (
+	github.com/go-sql-driver/mysql v1.5.0
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+)
