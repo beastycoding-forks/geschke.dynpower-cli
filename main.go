@@ -19,18 +19,15 @@ func main() {
 	hostDsn := hostCmd.String("dsn", "", "MySQL/MariaDB Data Source Name as described in https://github.com/go-sql-driver/mysql#dsn-data-source-name")
 	domainDsn := domainCmd.String("dsn", "", "MySQL/MariaDB Data Source Name as described in https://github.com/go-sql-driver/mysql#dsn-data-source-name")
 
-
 	dbname := os.Getenv("DBNAME")
 	dbhost := os.Getenv("DBHOST")
 	dbuser := os.Getenv("DBUSER")
 	dbpassword := os.Getenv("DBPASSWORD")
-	if len(dbname) >= 1 && len(dbhost) >= 1 && len(dbuser) >= 1 && len(dbpassword) => 1 {
-		dsn := dbuser+":"+dbpassword+"@tcp("+dbhost+":3306)/"+dbname
-		&hostDsn = dsn;
-		&domainDsn = dsn;
+	if len(dbname) >= 1 && len(dbhost) >= 1 && len(dbuser) >= 1 && len(dbpassword) >= 1 {
+		//dsn := dbuser + ":" + dbpassword + "@tcp(" + dbhost + ":3306)/" + dbname
+		//&hostDsn = dsn
+		//&domainDsn = dsn
 	}
-
-
 
 	/*dbPasswordPtr := flag.String("password", "", "Database password")
 	dbHostPtr := flag.String("host", "", "Database server")
