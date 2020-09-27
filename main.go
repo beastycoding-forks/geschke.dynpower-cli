@@ -3,21 +3,34 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/geschke/dynpower-cli/cmd"
 )
 
 func main() {
-	fmt.Println("dyncli is a small helper tool to manage the dynpower database.")
 
 	//flag.StringVar(&dsn, "dsn", "", "MySQL/MariaDB Data Source Name as described in https://github.com/go-sql-driver/mysql#dsn-data-source-name")
 
-	hostCmd := flag.NewFlagSet("host", flag.ExitOnError)
-	domainCmd := flag.NewFlagSet("domain", flag.ExitOnError)
+	hostCmd := flag.NewFlagSet("host", flag.ContinueOnError)
+	domainCmd := flag.NewFlagSet("domain", flag.ContinueOnError)
 
 	hostDsn := hostCmd.String("dsn", "", "MySQL/MariaDB Data Source Name as described in https://github.com/go-sql-driver/mysql#dsn-data-source-name")
 	domainDsn := domainCmd.String("dsn", "", "MySQL/MariaDB Data Source Name as described in https://github.com/go-sql-driver/mysql#dsn-data-source-name")
+
+
+	dbname := os.Getenv("DBNAME")
+	dbhost := os.Getenv("DBHOST")
+	dbuser := os.Getenv("DBUSER")
+	dbpassword := os.Getenv("DBPASSWORD")
+	if len(dbname) >= 1 && len(dbhost) >= 1 && len(dbuser) >= 1 && len(dbpassword) => 1 {
+		dsn := dbuser+":"+dbpassword+"@tcp("+dbhost+":3306)/"+dbname
+		&hostDsn = dsn;
+		&domainDsn = dsn;
+	}
+
+
 
 	/*dbPasswordPtr := flag.String("password", "", "Database password")
 	dbHostPtr := flag.String("host", "", "Database server")
@@ -43,6 +56,7 @@ func main() {
 		cmd.Encrypt(password)
 	case "domain":
 		command := flag.Arg(1)
+		log.Println(command)
 		if len(command) < 1 {
 			fmt.Println("\nManaga domains.\n")
 			fmt.Println("Available commands:")
@@ -52,9 +66,9 @@ func main() {
 			os.Exit(0)
 		}
 		domainCmd.Parse(os.Args[2:])
-		fmt.Println("subcommand 'domain'")
-		fmt.Println("  dsn:", *domainDsn)
-		fmt.Println("  tail:", domainCmd.Args())
+		fmt.Println("Execute subcommand 'domain'...")
+		//fmt.Println("  dsn:", *domainDsn)
+		//fmt.Println("  tail:", domainCmd.Args())
 
 		cmd.HandleDomain(domainCmd, *domainDsn)
 
@@ -62,7 +76,7 @@ func main() {
 	case "host":
 		command := flag.Arg(1)
 		if len(command) < 1 {
-			fmt.Println("\nManaga hosts.\n")
+			fmt.Println("\nManage hosts.\n")
 			fmt.Println("Available commands:")
 			fmt.Println("\tlist <domain>\t List hosts of <domain> in database.")
 			fmt.Println("\tadd <domain> <host>\t Add host of <domain> to database.")
@@ -78,11 +92,13 @@ func main() {
 
 		fmt.Println("")
 	default:
-		fmt.Println("Unknown or undefined command, please use the following commands:\n")
+		fmt.Println("dynpower-cli is a small helper tool to manage the dynpower database.")
+
+		fmt.Println("\nUnknown or undefined command, please use the following commands:\n")
 		fmt.Println("\tencrypt <password> :\t Encrypt password string to enter into database table.\n")
 
-		fmt.Println("\tdomain -dsn <dsn> <command> <options>:\t Manage domain entries.")
-		fmt.Println("\thost -dsn <dsn> <command> <options>:\t Manage host entries.")
+		fmt.Println("\tdomain [-dsn <dsn>] [command] [options]:\t Manage domain entries.")
+		fmt.Println("\thost [-dsn <dsn>] [command] [options]:\t Manage host entries.")
 
 		fmt.Println("\n\n")
 		os.Exit(0)
