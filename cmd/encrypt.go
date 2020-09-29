@@ -4,8 +4,25 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/spf13/cobra"
 	"golang.org/x/crypto/bcrypt"
 )
+
+func init() {
+	rootCmd.AddCommand(encryptCmd)
+}
+
+var encryptCmd = &cobra.Command{
+	Use:   "encrypt [access key]",
+	Short: "Encrypt access key string to enter into database table.",
+	//Long:  `All software has versions. This is Hugo's`,
+	Args: cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command,
+		args []string) {
+		Encrypt(args[0])
+
+	},
+}
 
 // HashPassword hashes a submitted string with bcrypt algorithm to store as password in database
 func HashPassword(password string) (string, error) {

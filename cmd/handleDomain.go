@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"database/sql"
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -45,7 +44,7 @@ func checkDb(dsn string) {
 	return
 }
 
-func list(dsn string) {
+func List(dsn string) {
 	db := dbConn(dsn)
 	//log.Println(dsn)
 	var maxStrlen int
@@ -120,12 +119,13 @@ func add(dsn string, domain string, accessKey string) {
 /*
 * Handle domain-related commands
  */
-func HandleDomain(fs *flag.FlagSet, dsn string) {
-	//fmt.Println("handle Domain command")
+func HandleDomain() {
+	//	func HandleDomain(fs *flag.FlagSet, dsn string) {
+	fmt.Println("handle Domain command")
 	//fmt.Println("DSN: " + dsn)
 
 	//fmt.Println(fs.Args())
-	switch fs.Arg(0) {
+	/*switch fs.Arg(0) {
 	case "list":
 		//fmt.Println("Command: list")
 		list(dsn)
@@ -144,6 +144,6 @@ func HandleDomain(fs *flag.FlagSet, dsn string) {
 		add(dsn, domain, accessKey)
 	default:
 		fmt.Println("Unknown command.")
-	}
+	}*/
 
 }
