@@ -39,7 +39,7 @@ var domainListCmd = &cobra.Command{
 	Long:  `List all domains in the dynpower database. If a DSN is submitted by the flag --dsn, this DSN will be used. If no DSN is provided, dynpower-cli tries to use the environment variables DBHOST, DBUSER, DBNAME and DBPASSWORD.`,
 	Run: func(cmd *cobra.Command,
 		args []string) {
-		list(domainDsn)
+		listDomain(domainDsn)
 	},
 }
 
@@ -50,7 +50,7 @@ var domainAddCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command,
 		args []string) {
-		add(domainDsn, args[0], args[1])
+		addDomain(domainDsn, args[0], args[1])
 	},
 }
 
@@ -97,7 +97,7 @@ func checkDb(dsn string) {
 	return
 }
 
-func list(dsn string) {
+func listDomain(dsn string) {
 	db := dbConn(dsn)
 	//log.Println(dsn)
 	var maxStrlen int
@@ -138,7 +138,7 @@ func list(dsn string) {
 
 }
 
-func add(dsn string, domain string, accessKey string) {
+func addDomain(dsn string, domain string, accessKey string) {
 	db := dbConn(dsn)
 	//log.Println(dsn)
 	//log.Println("in add...")
