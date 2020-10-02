@@ -1,7 +1,10 @@
 package cmd
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -81,47 +84,54 @@ var hostAddCmd = &cobra.Command{
 }*/
 
 func listHost(dsn string, domain string) {
-	//db := dbConn(dsn)
-	//log.Println(dsn)
-	//var maxStrlen int
-	/*
-		errLen := db.QueryRow("SELECT max(length(domainname)) as maxstrlen from domains").Scan(&maxStrlen)
+	db := dbConn(dsn)
 
-		if errLen != nil {
-			log.Println(errLen)
-			os.Exit(1)
-		}
-		//	log.Println("max: ")
-		//log.Println(maxStrlen)
+	var maxStrlenSQL sql.NullInt64
+	var maxStrlen int
 
-		results, err := db.Query("SELECT domainname, dt_created, dt_updated FROM domains ORDER by domainname")
+	errLen := db.QueryRow("SELECT max(length(r.hostname)) as maxstrlen from dynrecords r, domains d WHERE r.domain_id=d.id AND d.domainname=?", domain).Scan(&maxStrlenSQL)
 
+	if errLen != nil {
+		fmt.Println(errLen)
+		os.Exit(1)
+	}
+	if maxStrlenSQL.Valid {
+		maxStrlen = int(maxStrlenSQL.Int64)
+	} else {
+		maxStrlen = 0
+	}
+	if maxStrlen == 0 {
+		fmt.Printf("No host entry for domain %s found.\n", domain)
+		os.Exit(0)
+	}
+
+	maxStrlen = len(domain) + 1 + maxStrlen + 2
+
+	results, err := db.Query("SELECT d.domainname, r.hostname, r.dt_created, r.dt_updated FROM domains d, dynrecords r WHERE d.domainname=? AND d.id=r.domain_id ORDER by r.hostname", domain)
+
+	if err != nil {
+		log.Println("Database problem: " + err.Error())
+		os.Exit(1)
+		//panic(err.Error()) // proper error handling instead of panic in your app
+	}
+
+	defer db.Close()
+
+	fmt.Println("Hosts in database:")
+	fmt.Printf("%-"+fmt.Sprintf("%d", maxStrlen)+"s%-21s%-21s\n", "Host", "Created", "Updated")
+	var domainname, host, dtCreated, dtUpdated string
+	for results.Next() {
+
+		// for each row, scan the result into our tag composite object
+		err = results.Scan(&domainname, &host, &dtCreated, &dtUpdated)
 		if err != nil {
-			log.Println("Database problem: " + err.Error())
+			fmt.Println(err.Error()) // proper error handling instead of panic in your app
 			os.Exit(1)
-			//panic(err.Error()) // proper error handling instead of panic in your app
 		}
+		// and then print out the tag's Name attribute
+		fmt.Printf("%-"+fmt.Sprintf("%d", maxStrlen)+"s%-21s%-21s\n", host+"."+domainname, dtCreated, dtUpdated)
 
-		defer db.Close()
-
-		maxStrlen = maxStrlen + 2
-
-		fmt.Println("Domains in database:")
-		fmt.Printf("%-"+fmt.Sprintf("%d", maxStrlen)+"s%-21s%-21s\n", "Domain", "Created", "Updated")
-		var domainname, dtCreated, dtUpdated string
-		for results.Next() {
-
-			// for each row, scan the result into our tag composite object
-			err = results.Scan(&domainname, &dtCreated, &dtUpdated)
-			if err != nil {
-				panic(err.Error()) // proper error handling instead of panic in your app
-			}
-			// and then print out the tag's Name attribute
-			fmt.Printf("%-"+fmt.Sprintf("%d", maxStrlen)+"s%-21s%-21s\n", domainname, dtCreated, dtUpdated)
-
-
-		}*/
-	fmt.Println("list hosts")
+	}
 
 }
 
@@ -132,23 +142,35 @@ func addHost(dsn string, domain string, host string) {
 	//log.Println(domain)
 	//log.Println(accessKey)
 
+	var domainId int
+	// todo: check existence of domain
+	// add host
+
 	// get domain id
-	/*
-		result, err := db.Prepare("INSERT INTO dynrecords (hostname, dt_created, dt_created) VALUES (?,now(), now())")
-		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(1)
-		}
+	errLen := db.QueryRow("SELECT id from domains d WHERE d.domainname=?", domain).Scan(&domainId)
 
-		_, insertErr := result.Exec(domain, hashedAccessKey)
-		if insertErr != nil {
-			fmt.Println(insertErr.Error())
-			os.Exit(1)
-		}
+	if errLen != nil {
+		fmt.Println(errLen)
+		os.Exit(1)
+	}
 
-		fmt.Println("Domain " + domain + " added successfully")
-	*/
-	fmt.Println("add host")
+	fmt.Println("domain id: ")
+	fmt.Println(domainId)
+
+	result, err := db.Prepare("INSERT INTO dynrecords (domain_id, hostname, dt_created, dt_updated) VALUES (?,?,now(), now())")
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	_, insertErr := result.Exec(domainId, host)
+	if insertErr != nil {
+		fmt.Println(insertErr.Error())
+		os.Exit(1)
+	}
+
+	fmt.Println("Host " + host + "." + domain + " added successfully")
+
 	defer db.Close()
 }
 
