@@ -11,13 +11,16 @@ import (
 )
 
 var domainDsn string
+var domainForce bool
 
 func init() {
 	domainCmd.PersistentFlags().StringVarP(&domainDsn, "dsn", "d", "", "MySQL/MariaDB Data Source Name as described in https://github.com/go-sql-driver/mysql")
+	domainRemoveCmd.Flags().BoolVarP(&domainForce, "force", "f", false, "If true, delete domain with all hosts. If false (default), a domain isn't deleted if any host of the domain exists.")
 
 	rootCmd.AddCommand(domainCmd)
 	domainCmd.AddCommand(domainListCmd)
 	domainCmd.AddCommand(domainAddCmd)
+	domainCmd.AddCommand(domainRemoveCmd)
 
 }
 
@@ -51,6 +54,17 @@ var domainAddCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command,
 		args []string) {
 		addDomain(domainDsn, args[0], args[1])
+	},
+}
+
+var domainRemoveCmd = &cobra.Command{
+	Use:   "remove [domain]",
+	Short: "Remove domain from database",
+	Long:  `Remove domain from dynpower database. If a DSN is submitted by the flag --dsn, this DSN will be used. If no DSN is provided, dynpower-cli tries to use the environment variables DBHOST, DBUSER, DBNAME and DBPASSWORD.`,
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command,
+		args []string) {
+		removeDomain(domainDsn, args[0])
 	},
 }
 
@@ -165,6 +179,38 @@ func addDomain(dsn string, domain string, accessKey string) {
 	}
 
 	fmt.Println("Domain " + domain + " added successfully")
+
+	defer db.Close()
+}
+
+func removeDomain(dsn string, domain string) {
+	db := dbConn(dsn)
+	fmt.Println(domainForce)
+	//log.Println(dsn)
+	//log.Println("in add...")
+	//log.Println(domain)
+	//log.Println(accessKey)
+
+	/*	hashedAccessKey, err := HashPassword(accessKey)
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
+		//log.Println(hashedAccessKey)
+
+		result, err := db.Prepare("INSERT INTO domains(domainname, access_key, dt_created) VALUES(?,?, now())")
+		if err != nil {
+			fmt.Println(err.Error())
+			os.Exit(1)
+		}
+
+		_, insertErr := result.Exec(domain, hashedAccessKey)
+		if insertErr != nil {
+			fmt.Println(insertErr.Error())
+			os.Exit(1)
+		}
+	*/
+	fmt.Println("Domain " + domain + " removed successfully")
 
 	defer db.Close()
 }
