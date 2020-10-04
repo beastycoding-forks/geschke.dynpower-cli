@@ -66,35 +66,6 @@ var hostRemoveCmd = &cobra.Command{
 	},
 }
 
-/*func dbConn(dsn string) (db *sql.DB) {
-	if len(dsn) < 1 {
-		dbname := os.Getenv("DBNAME") // maybe use LookupEnv to detect if env variable exists
-		dbhost := os.Getenv("DBHOST")
-		dbuser := os.Getenv("DBUSER")
-		dbpassword := os.Getenv("DBPASSWORD")
-		dbport := os.Getenv("DBPORT")
-		if len(dbport) < 1 {
-			dbport = "3306"
-		}
-		if len(dbname) >= 1 && len(dbhost) >= 1 && len(dbuser) >= 1 && len(dbpassword) >= 1 {
-			dsn = dbuser + ":" + dbpassword + "@tcp(" + dbhost + ":" + dbport + ")/" + dbname
-
-		} else {
-			fmt.Println("No database connect parameter found, exiting. Please use --dsn or environment variables to define database connection.")
-			os.Exit(1)
-		}
-
-	}
-
-	db, err := sql.Open("mysql", dsn)
-	if err != nil {
-		fmt.Println("Error by connecting database.")
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-	return db
-}*/
-
 func listHost(dsn string, domain string) {
 	db := dbConn(dsn)
 
@@ -166,9 +137,6 @@ func addHost(dsn string, domain string, host string) {
 		fmt.Println(errLen)
 		os.Exit(1)
 	}
-
-	fmt.Println("domain id: ")
-	fmt.Println(domainId)
 
 	result, err := db.Prepare("INSERT INTO dynrecords (domain_id, hostname, dt_created, dt_updated) VALUES (?,?,now(), now())")
 	if err != nil {
