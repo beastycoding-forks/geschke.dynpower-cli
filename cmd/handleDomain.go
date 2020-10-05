@@ -114,15 +114,25 @@ func checkDb(dsn string) {
 func listDomain(dsn string) {
 	db := dbConn(dsn)
 	//log.Println(dsn)
+
+	var maxStrlenSQL sql.NullInt64
 	var maxStrlen int
-	errLen := db.QueryRow("SELECT max(length(domainname)) as maxstrlen from domains").Scan(&maxStrlen)
+
+	errLen := db.QueryRow("SELECT max(length(domainname)) as maxstrlen from domains").Scan(&maxStrlenSQL)
 
 	if errLen != nil {
-		log.Println(errLen)
+		fmt.Println(errLen)
 		os.Exit(1)
 	}
-	//	log.Println("max: ")
-	//log.Println(maxStrlen)
+	if maxStrlenSQL.Valid {
+		maxStrlen = int(maxStrlenSQL.Int64)
+	} else {
+		maxStrlen = 0
+	}
+	if maxStrlen == 0 {
+		fmt.Println("No domain in database, use add command to create domain entry")
+		os.Exit(0)
+	}
 
 	results, err := db.Query("SELECT domainname, dt_created, dt_updated FROM domains ORDER by domainname")
 
