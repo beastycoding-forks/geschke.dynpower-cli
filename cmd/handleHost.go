@@ -12,7 +12,7 @@ import (
 var hostDsn string
 
 func init() {
-	hostCmd.PersistentFlags().StringVarP(&domainDsn, "dsn", "d", "", "MySQL/MariaDB Data Source Name as described in https://github.com/go-sql-driver/mysql")
+	hostCmd.PersistentFlags().StringVarP(&hostDsn, "dsn", "d", "", "MySQL/MariaDB Data Source Name as described in https://github.com/go-sql-driver/mysql")
 
 	rootCmd.AddCommand(hostCmd)
 	hostCmd.AddCommand(hostListCmd)
